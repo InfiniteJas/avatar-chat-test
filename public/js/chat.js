@@ -1032,8 +1032,9 @@ function startMicrophone(language) {
         // Английский - строго БЕЗ автодетекта
         speechRecognitionConfig.speechRecognitionLanguage = "en-US";
         speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
-            speechRecognitionConfig,
-            SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
+          speechRecognitionConfig,
+          /* autoDetect */ undefined,
+          SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
         );
         console.log("🎤 STT режим: English (strict, no auto-detect)");
     } else if (language === "ru") {
