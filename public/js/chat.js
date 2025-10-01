@@ -36,6 +36,116 @@ var functionCallsEndpoint = '/api/assistant';
 // pending UI
 var pendingMsgEl = null;
 
+// Словарь регионов (структура как у разраба, но расширенный)
+const REGION_MAPPING = {
+    "Акмолинская область": [
+        "Акмола", "Акмолинская область", "Акмолинская", "Ақмола облысы",
+        "Akmola", "Akmola region", "Aqmola"  // + английские варианты
+    ],
+    "Актюбинская область": [
+        "Актобе", "Актюбинская область", "Актюбинская", "Ақтөбе облысы",
+        "Aktobe", "Aktobe region", "Aqtobe"
+    ],
+    "Алматинская область": [
+        "Алматинская область", "Алматинская", "Алматы облысы",
+        "Almaty region", "Almaty oblast"
+    ],
+    "Атырауская область": [
+        "Атырау", "Атырауская область", "Атырауская", "Атырау облысы",
+        "Atyrau", "Atyrau region"
+    ],
+    "Восточно-Казахстанская область": [
+        "ВКО", "Восточно-Казахстанская область", "Восточно-Казахстанская", 
+        "ШҚО", "Өскемен", "Усть-Каменогорск",
+        "East Kazakhstan", "VKO", "Ust-Kamenogorsk"
+    ],
+    "Жамбылская область": [
+        "Жамбыл", "Жамбылская область", "Жамбылская", "Жамбыл облысы", "Тараз",
+        "Zhambyl", "Zhambyl region", "Jambyl", "Taraz"
+    ],
+    "Западно-Казахстанская область": [
+        "ЗКО", "Западно-Казахстанская область", "Западно-Казахстанская", 
+        "Батыс Қазақстан облысы", "Уральск",
+        "West Kazakhstan", "ZKO", "Uralsk"
+    ],
+    "Карагандинская область": [
+        "Караганда", "Карагандинская область", "Карагандинская", "Қарағанды облысы",
+        "Karaganda", "Karagandy", "Qaraghandy"
+    ],
+    "Костанайская область": [
+        "Костанай", "Костанайская область", "Костанайская", "Қостанай облысы",
+        "Kostanay", "Qostanay"
+    ],
+    "Кызылординская область": [
+        "Кызылорда", "Кызылординская область", "Кызылординская", "Қызылорда облысы",
+        "Kyzylorda", "Qyzylorda"
+    ],
+    "Мангистауская область": [
+        "Мангистауская область", "Мангистауская", "Мангистауская обл.", 
+        "Маңғыстау облысы", "Актау",
+        "Mangystau", "Mangistau", "Aktau"
+    ],
+    "Павлодарская область": [
+        "Павлодар", "Павлодарская область", "Павлодарская", "Павлодар облысы",
+        "Pavlodar", "Pavlodar region"
+    ],
+    "Северо-Казахстанская область": [
+        "СКО", "Северо-Казахстанская область", "Северо-Казахстанская", 
+        "Солтүстік Қазақстан облысы", "Петропавловск",
+        "North Kazakhstan", "SKO", "Petropavlovsk"
+    ],
+    "Туркестанская область": [
+        "Туркестан", "Туркестанская область", "Туркестанская", "Түркістан облысы",
+        "Turkestan", "Turkistan"
+    ],
+    "Область Абай": [
+        "Абай", "Абайская область", "Абай облысы", "Семей",
+        "Abai", "Abay", "Semey"
+    ],
+    "Область Жетісу": [
+        "Жетісу", "Жетісуская область", "Жетісу облысы", "Талдыкорган",
+        "Zhetysu", "Jetisu", "Taldykorgan"
+    ],
+    "Область Ұлытау": [
+        "Улытау", "Улытауская область", "Ұлытау облысы", "Жезказган",
+        "Ulytau", "Zhezkazgan"
+    ],
+    "город Алматы": [
+        "Алматы", "г. Алматы", "г.Алматы", "Almaty", "Almaty city"
+    ],
+    "город Астана": [
+        "Астана", "г. Астана", "г.Астана", "Astana", "Astana city"
+    ],
+    "город Шымкент": [
+        "Шымкент", "г. Шымкент", "г.Шымкент", "Shymkent", "Shymkent city"
+    ]
+};
+
+// Функция нормализации (улучшенная)
+function normalizeRegionNames(text) {
+    let normalized = text;
+    const lowerText = text.toLowerCase();
+    
+    // Проходим по каждому каноническому названию
+    for (const [canonical, variants] of Object.entries(REGION_MAPPING)) {
+        // Сортируем варианты от длинных к коротким (для точности)
+        const sortedVariants = variants.sort((a, b) => b.length - a.length);
+        
+        for (const variant of sortedVariants) {
+            // Используем word boundary для точности
+            const regex = new RegExp(`\\b${variant.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'gi');
+            
+            if (regex.test(normalized)) {
+                normalized = normalized.replace(regex, canonical);
+                console.log(`📍 Нормализация: "${variant}" → "${canonical}"`);
+                break; // Нашли совпадение, переходим к следующему региону
+            }
+        }
+    }
+    
+    return normalized;
+}
+
 function showPending(text) {
     const list = chatEl();
     if (!list) return;
@@ -234,11 +344,12 @@ function connectAvatar() {
     } else {
         speechRecognitionConfig = SpeechSDK.SpeechConfig.fromEndpoint(new URL(`wss://${cogSvcRegion}.stt.speech.microsoft.com/speech/universal/v2`), cogSvcSubKey);
     }
-    speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
-    var sttLocales = document.getElementById('sttLocales').value.split(',');
-    var autoDetectSourceLanguageConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(sttLocales);
-    speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(speechRecognitionConfig, autoDetectSourceLanguageConfig, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
-
+    // speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
+    // var sttLocales = document.getElementById('sttLocales').value.split(',');
+    // var autoDetectSourceLanguageConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(sttLocales);
+    // speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(speechRecognitionConfig, autoDetectSourceLanguageConfig, SpeechSDK.AudioConfig.fromDefaultMicrophoneInput());
+    speechRecognizer = null;
+    
     if (!messageInitiated) {
         initMessages();
         messageInitiated = true;
@@ -430,16 +541,20 @@ function initMessages() {
 
 async function createThread(userQuery) {
     try {
-        const systemPrompt = getSystemPromptWithLanguage(selectedLanguage);
+        // const systemPrompt = getSystemPromptWithLanguage(selectedLanguage);
+        const langInstruction = {
+            ru: "[ИНСТРУКЦИЯ: Ответь на РУССКОМ языке. Все запросы к функциям формулируй на русском.]",
+            kk: "[НҰСҚАУЛЫҚ: ҚАЗАҚ тілінде жауап беріңіз. Барлық функция сұрауларын орыс тілінде жасаңыз.]",
+            en: "[INSTRUCTION: Respond in ENGLISH language. Formulate all function queries in Russian language.]"
+        };
+        
+        const userMessageWithLang = `${langInstruction[selectedLanguage]}\n\n${userQuery}`;
         
         const response = await fetch(`/api/threads`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: userQuery }
-                ]
+                messages: [{ role: 'user', content: userMessageWithLang }]
             })
         });
         if (!response.ok) {
@@ -529,58 +644,41 @@ function stopSpeaking() {
     );
 }
 
-// 🎯 НОВАЯ ФУНКЦИЯ: Обработка пользовательского запроса с указанным языком
+// НОВАЯ ФУНКЦИЯ: Обработка пользовательского запроса с указанным языком
 function handleUserQuery(userQuery, userQueryHTML = "", imgUrlPath = "", language = "ru") {
     lastInteractionTime = new Date();
-
-    // 🎯 СОХРАНЯЕМ ВЫБРАННЫЙ ЯЗЫК
     selectedLanguage = language;
-    console.log(`🌍 Пользователь выбрал язык: ${selectedLanguage}`);
+    console.log(`🌐 Пользователь выбрал язык: ${selectedLanguage}`);
     console.log(`🗣️ Пользователь сказал: "${userQuery}"`);
+
+    // НОВОЕ: Нормализуем названия регионов
+    const normalizedQuery = normalizeRegionNames(userQuery);
 
     if (isSpeaking) {
         stopSpeaking();
     }
 
     if (!threadId) {
-        createThread(userQuery);
+        createThread(normalizedQuery);
     } else {
-        addMessageToThread(userQuery);
-    }
-}
-
-async function createThread(userQuery) {
-    try {
-        const response = await fetch(`/api/threads`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                messages: [{ role: 'user', content: userQuery }]
-            })
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Proxy error: ${errorData.error || response.statusText}`);
-        }
-        const thread = await response.json();
-        threadId = thread.id;
-        fetchAndRenderThreadMessages();
-        showPending('Отправили запрос…');
-        console.log('Thread created via proxy:', threadId);
-        runAssistant();
-
-    } catch (error) {
-        console.error('Error creating thread:', error);
-        displayError('Ошибка создания беседы');
+        addMessageToThread(normalizedQuery);
     }
 }
 
 async function addMessageToThread(userQuery) {
     try {
+        const langInstruction = {
+            ru: "[ИНСТРУКЦИЯ: Ответь на РУССКОМ языке. Все запросы к функциям формулируй на русском.]",
+            kk: "[НҰСҚАУЛЫҚ: ҚАЗАҚ тілінде жауап беріңіз. Барлық функция сұрауларын орыс тілінде жасаңыз.]",
+            en: "[INSTRUCTION: Respond in ENGLISH language. Formulate all function queries in Russian language.]"
+        };
+        
+        const userMessageWithLang = `${langInstruction[selectedLanguage]}\n\n${userQuery}`;
+        
         const response = await fetch(`/api/threads/${threadId}/messages`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ role: 'user', content: userQuery })
+            body: JSON.stringify({ role: 'user', content: userMessageWithLang })
         });
         if (!response.ok) throw new Error('Failed to add message');
         console.log('Message added to thread via proxy');
@@ -851,7 +949,6 @@ function startMicrophone(language) {
     lastInteractionTime = new Date();
     selectedLanguage = language;
 
-    // Определяем параметры для каждого языка
     const buttonMap = {
         ru: { id: 'microphoneRussian', label: '&#127897; Русский', activeLabel: '⏹ Русский' },
         kk: { id: 'microphoneKazakh', label: '&#127897; Қазақша', activeLabel: '⏹ Қазақша' },
@@ -861,7 +958,7 @@ function startMicrophone(language) {
     const currentButton = buttonMap[language];
     const buttonId = currentButton.id;
 
-    // 🔴 STOP: останавливаем распознавание и ОТПРАВЛЯЕМ накопленный буфер
+    // STOP: останавливаем распознавание
     if (document.getElementById(buttonId).innerHTML.includes('⏹')) {
         muteWhileRecording = false;
         const ap = document.getElementById('audioPlayer');
@@ -872,7 +969,6 @@ function startMicrophone(language) {
                 document.getElementById(buttonId).innerHTML = currentButton.label;
                 document.getElementById(buttonId).disabled = false;
                 
-                // Разблокировать все кнопки
                 for (let key in buttonMap) {
                     document.getElementById(buttonMap[key].id).disabled = false;
                 }
@@ -892,7 +988,7 @@ function startMicrophone(language) {
         return;
     }
 
-    // ▶️ START
+    // START
     if (document.getElementById('useLocalVideoForIdle').checked) {
         if (!sessionActive) connectAvatar();
         setTimeout(() => {
@@ -906,15 +1002,60 @@ function startMicrophone(language) {
         }
     }
 
-    // Блокируем все кнопки на время старта
     for (let key in buttonMap) {
         document.getElementById(buttonMap[key].id).disabled = true;
     }
 
-    speechRecognizer.recognizing = null;
-    speechRecognizer.recognized = null;
-    speechRecognizer.canceled = null;
-    speechRecognizer.sessionStopped = null;
+    // 🎯 НОВОЕ: Создаём новый распознаватель с правильными языками
+    const cogSvcRegion = document.getElementById('region').value;
+    const cogSvcSubKey = document.getElementById('APIKey').value;
+    
+    let speechRecognitionConfig;
+    const privateEndpointEnabled = document.getElementById('enablePrivateEndpoint').checked;
+    const privateEndpoint = document.getElementById('privateEndpoint').value.slice(8);
+    
+    if (privateEndpointEnabled) {
+        speechRecognitionConfig = SpeechSDK.SpeechConfig.fromEndpoint(
+            new URL(`wss://${privateEndpoint}/stt/speech/universal/v2`), 
+            cogSvcSubKey
+        );
+    } else {
+        speechRecognitionConfig = SpeechSDK.SpeechConfig.fromEndpoint(
+            new URL(`wss://${cogSvcRegion}.stt.speech.microsoft.com/speech/universal/v2`), 
+            cogSvcSubKey
+        );
+    }
+    
+    // Настраиваем языки в зависимости от выбранного режима
+    if (language === "en") {
+        // Английский - строго БЕЗ автодетекта
+        speechRecognitionConfig.speechRecognitionLanguage = "en-US";
+        speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
+            speechRecognitionConfig,
+            SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
+        );
+        console.log("🎤 STT режим: English (strict, no auto-detect)");
+    } else if (language === "ru") {
+        // Русский с fallback на казахский
+        speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
+        var autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["ru-RU", "kk-KZ"]);
+        speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
+            speechRecognitionConfig,
+            autoDetectConfig,
+            SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
+        );
+        console.log("🎤 STT режим: Russian (primary) + Kazakh (fallback)");
+    } else if (language === "kk") {
+        // Казахский с fallback на русский
+        speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
+        var autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["kk-KZ", "ru-RU"]);
+        speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
+            speechRecognitionConfig,
+            autoDetectConfig,
+            SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
+        );
+        console.log("🎤 STT режим: Kazakh (primary) + Russian (fallback)");
+    }
 
     sttBuffer = '';
 
@@ -951,7 +1092,6 @@ function startMicrophone(language) {
             document.getElementById(buttonId).innerHTML = currentButton.activeLabel;
             document.getElementById(buttonId).disabled = false;
             
-            // Блокируем другие кнопки
             for (let key in buttonMap) {
                 if (key !== language) {
                     document.getElementById(buttonMap[key].id).disabled = true;
@@ -1038,6 +1178,7 @@ window.stopSession = () => {
     document.getElementById('startSession').disabled = false;
     document.getElementById('microphoneRussian').disabled = true;
     document.getElementById('microphoneKazakh').disabled = true;
+    document.getElementById('microphoneEnglish').disabled = true;
     document.getElementById('stopSession').disabled = true;
     document.getElementById('configuration').hidden = false;
     document.getElementById('showTypeMessage').checked = false;
