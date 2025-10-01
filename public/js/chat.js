@@ -1,4 +1,5 @@
 // Глобальные объекты
+
 var speechRecognizer;
 var avatarSynthesizer;
 var peerConnection;
