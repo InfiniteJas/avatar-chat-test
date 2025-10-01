@@ -742,6 +742,9 @@ function displayAndSpeakResponse(text, language) {
     if (language === "kk") {
         ttsVoice = "kk-KZ-AigulNeural";
         xmlLang = "kk-KZ";
+    } else if (language === "en") {
+        ttsVoice = "en-US-AriaNeural";
+        xmlLang = "en-US";
     } else {
         ttsVoice = "ru-RU-SvetlanaNeural";
         xmlLang = "ru-RU";
@@ -808,13 +811,24 @@ window.microphoneKazakh = () => {
     startMicrophone("kk");
 };
 
+window.microphoneEnglish = () => {
+    console.log("🎤 Выбран английский микрофон");
+    startMicrophone("en");
+};
+
 function startMicrophone(language) {
     lastInteractionTime = new Date();
     selectedLanguage = language;
 
-    const isRussianActive = (language === "ru");
-    const buttonId = isRussianActive ? 'microphoneRussian' : 'microphoneKazakh';
-    const otherButtonId = isRussianActive ? 'microphoneKazakh' : 'microphoneRussian';
+    // Определяем параметры для каждого языка
+    const buttonMap = {
+        ru: { id: 'microphoneRussian', label: '&#127897; Русский', activeLabel: '⏹ Русский' },
+        kk: { id: 'microphoneKazakh', label: '&#127897; Қазақша', activeLabel: '⏹ Қазақша' },
+        en: { id: 'microphoneEnglish', label: '&#127897; English', activeLabel: '⏹ English' }
+    };
+
+    const currentButton = buttonMap[language];
+    const buttonId = currentButton.id;
 
     // 🔴 STOP: останавливаем распознавание и ОТПРАВЛЯЕМ накопленный буфер
     if (document.getElementById(buttonId).innerHTML.includes('⏹')) {
@@ -824,11 +838,14 @@ function startMicrophone(language) {
         document.getElementById(buttonId).disabled = true;
         speechRecognizer.stopContinuousRecognitionAsync(
             () => {
-                document.getElementById(buttonId).innerHTML = isRussianActive ? '&#127897; Русский' : '&#127897; Қазақша';
+                document.getElementById(buttonId).innerHTML = currentButton.label;
                 document.getElementById(buttonId).disabled = false;
-                document.getElementById(otherButtonId).disabled = false;
+                
+                // Разблокировать все кнопки
+                for (let key in buttonMap) {
+                    document.getElementById(buttonMap[key].id).disabled = false;
+                }
 
-                // берём финальный текст и очищаем буфер
                 const finalText = sttBuffer.trim();
                 sttBuffer = '';
                 if (finalText) {
@@ -858,44 +875,37 @@ function startMicrophone(language) {
         }
     }
 
-    // блокируем обе кнопки на время старта
-    document.getElementById('microphoneRussian').disabled = true;
-    document.getElementById('microphoneKazakh').disabled = true;
+    // Блокируем все кнопки на время старта
+    for (let key in buttonMap) {
+        document.getElementById(buttonMap[key].id).disabled = true;
+    }
 
-    // сбрасываем предыдущие обработчики, чтобы не дублировались
     speechRecognizer.recognizing = null;
     speechRecognizer.recognized = null;
     speechRecognizer.canceled = null;
     speechRecognizer.sessionStopped = null;
 
-    // очищаем буфер при новом запуске
     sttBuffer = '';
 
-    // 🟡 промежуточные гипотезы (не отправляем, только копим/при желании можно подсвечивать в UI)
     speechRecognizer.recognizing = (s, e) => {
         if (e.result && e.result.text) {
-            // не добавляем в буфер (это промежуточно), можно показать в UI при желании
-            // например: document.getElementById('userMessageBox').textContent = e.result.text;
+            // Промежуточные гипотезы
         }
     };
 
-    // 🟢 финальные сегменты — аккумулируем в буфере
     speechRecognizer.recognized = (s, e) => {
         if (e.result && e.result.reason === SpeechSDK.ResultReason.RecognizedSpeech) {
             const chunk = e.result.text.trim();
             if (chunk) {
-                // добавляем пробел между сегментами (могут быть несколько при длинной речи)
                 sttBuffer += (sttBuffer ? ' ' : '') + chunk;
             }
         }
     };
 
-    // ❌ отмена — просто лог/сброс (ничего не отправляем)
     speechRecognizer.canceled = (s, e) => {
         console.log("Recognition canceled:", e);
     };
 
-    // ⏹ конец сессии — здесь ничего не шлём; отправление делаем ТОЛЬКО в ветке Stop выше
     speechRecognizer.sessionStopped = (s, e) => {
         console.log("Recognition session stopped");
     };
@@ -905,21 +915,26 @@ function startMicrophone(language) {
     const ap = document.getElementById('audioPlayer');
     if (ap) ap.muted = true;
 
-    // запуск
     speechRecognizer.startContinuousRecognitionAsync(
         () => {
-            document.getElementById(buttonId).innerHTML = isRussianActive ? '⏹ Русский' : '⏹ Қазақша';
+            document.getElementById(buttonId).innerHTML = currentButton.activeLabel;
             document.getElementById(buttonId).disabled = false;
-            document.getElementById(otherButtonId).disabled = true; // блокируем вторую кнопку
+            
+            // Блокируем другие кнопки
+            for (let key in buttonMap) {
+                if (key !== language) {
+                    document.getElementById(buttonMap[key].id).disabled = true;
+                }
+            }
         },
         (err) => {
             console.log("Failed to start continuous recognition:", err);
-            document.getElementById(buttonId).disabled = false;
-            document.getElementById(otherButtonId).disabled = false;
+            for (let key in buttonMap) {
+                document.getElementById(buttonMap[key].id).disabled = false;
+            }
         }
     );
 }
-
 
 // Остальные вспомогательные функции
 function checkHung() {
