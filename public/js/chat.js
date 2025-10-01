@@ -27,7 +27,7 @@ var muteWhileRecording = false;
 var selectedLanguage = "ru"; // по умолчанию русский
 
 // Assistant API переменные
-var assistantId = 'asst_LMHsNblhuLgYt9I2RpMfm3Kr';
+var assistantId = 'asst_6NOlwHDqZx81wOFUG0O5NSzE';
 var threadId = null;
 var runId = null;
 var functionCallsEndpoint = '/api/assistant';
