@@ -1038,7 +1038,7 @@ function startMicrophone(language) {
     } else if (language === "ru") {
         // Русский с fallback на казахский
         speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
-        var autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["ru-RU", "kk-KZ"]);
+        const autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["ru-RU", "kk-KZ"]);
         speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
             speechRecognitionConfig,
             autoDetectConfig,
@@ -1048,7 +1048,7 @@ function startMicrophone(language) {
     } else if (language === "kk") {
         // Казахский с fallback на русский
         speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
-        var autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["kk-KZ", "ru-RU"]);
+        const autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["kk-KZ", "ru-RU"]);
         speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
             speechRecognitionConfig,
             autoDetectConfig,
