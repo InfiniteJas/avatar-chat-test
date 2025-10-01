@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <script>
+    (function () {
+      var OK_KEY = 'pw_ok_v1';
+      if (sessionStorage.getItem(OK_KEY) === '1') return;
+
+      var p = prompt('Введите пароль для доступа:');
+      if (p === 'OpLo123a778641s') {
+        sessionStorage.setItem(OK_KEY, '1');
+        return;
+      }
+
+      document.open();
+      document.write('<!doctype html><title>Доступ запрещён</title>' +
+        '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial">' +
+        '<div style="text-align:center">' +
+        '<h1 style="margin:0 0 8px;font-size:28px">Доступ запрещён</h1>' +
+        '<div style="opacity:.7">Неверный пароль</div>' +
+        '</div></div>');
+      document.close();
+      throw new Error('Access blocked: wrong password');
+    })();
+  </script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JIbek</title>
+  <link href="./css/styles.css" rel="stylesheet">
+  <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+  <script src="./js/chat.js"></script>
+</head>
+
+<body>
+  <div id="configuration" style="display: none;">
+    <h2 style="background-color: white; width: 300px;">Azure Speech Resource</h2>
+    <div id="azureSpeechResource" style="display: flex;align-items: center; flex-wrap: wrap;">
+      <div>
+        <label style="font-size: medium;" for="region">Region:</label>
+        <select id="region" style="font-size: medium;">
+          <option value="westus2">West US 2</option>
+          <option value="westeurope">West Europe</option>
+          <option value="southeastasia">Southeast Asia</option>
+          <option value="southcentralus">South Central US</option>
+          <option value="northeurope">North Europe</option>
+          <option value="swedencentral">Sweden Central</option>
+          <option value="eastus2" selected>East US 2</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size: medium;" for="APIKey">API Key:</label>
+        <input id="APIKey" type="password" size="32" style="font-size: medium;"
+          value="EIoIUPiWHfwipyE98dOEbS2C29O5ipQCOKFzvoYw6Wfis48p9ufTJQQJ99BIACHYHv6XJ3w3AAAYACOGHLHa" />
+      </div>
+    </div>
+    <div style="background-color: white; width: 300px;">
+      <input type="checkbox" id="enablePrivateEndpoint" onchange="window.updatePrivateEndpoint()">Enable Private
+      Endpoint</input><br />
+    </div>
+    <div id="showPrivateEndpointCheckBox" hidden="hidden">
+      <label style="font-size: medium;" for="privateEndpoint">Private Endpoint:</label>
+      <input id="privateEndpoint" type="text" size="64" style="font-size: medium;"
+        placeholder="https://{your custom name}.cognitiveservices.azure.com/"></input><br />
+    </div><br />
+
+    <h2 style="background-color: white; width: 300px;">Azure OpenAI Resource</h2>
+    <label style="font-size: medium;" for="azureOpenAIEndpoint">Endpoint:</label>
+    <input id="azureOpenAIEndpoint" type="text" size="64" style="font-size: medium;"
+      value="https://a-ass55.openai.azure.com/"></input><br />
+    <label style="font-size: medium;" for="azureOpenAIApiKey">API Key:</label>
+    <input id="azureOpenAIApiKey" type="password" size="32" style="font-size: medium;"
+      value="FBx0qou5mQpzUs5cW4itbIk42WlgAj8TpmAjbw5cWg2QJQQJ99BIACHYHv6XJ3w3AAABACOGYhoG" /><br />
+    <label style="font-size: medium;" for="azureOpenAIDeploymentName">Deployment Name:</label>
+    <input id="azureOpenAIDeploymentName" type="text" size="32" style="font-size: medium;" value="gpt-4o-mini" /><br />
+    <label style="font-size: medium;" for="prompt">System Prompt:</label><br />
+    <textarea id="prompt" style="max-width: 640px;">Я — ваш ИИ-ассистент. Я работаю на базе суперкомпьютера alem.ai и сейчас учусь на агрегированных данных. Мои возможности: анализировать социально-экономическую ситуацию по регионам, отвечать на вопросы о международном опыте госуправления и предлагать темы для совещаний на основе актуальной информации из интернета и динамики социальных показателей в стране.
+
+КРИТИЧЕСКИ ВАЖНО: Ты ОБЯЗАН использовать соответствующие функции для КАЖДОГО запроса. Приоритет всегда отдается актуальным данным из систем.
+
+ТВОИ ФУНКЦИИ И ТОЧНЫЕ КРИТЕРИИ ИСПОЛЬЗОВАНИЯ:
+
+1. **db_query** - ТОЛЬКО для запросов к государственным базам ЦКС/ikomek/eOtinish
+   ИСПОЛЬЗУЙ КОГДА: статистика по регионам, количество обращений, рейтинги акиматов, социальные показатели РК
+   ПРИМЕРЫ: "сколько семей получают АСП в Алматы", "статистика обращений по Павлодару"
+   ФОРМАТ ЗАПРОСА: четкий русский вопрос для поиска в базе данных
+
+2. **law_based_answering** - для правовых вопросов с поиском актуальной информации
+   ИСПОЛЬЗУЙ КОГДА: законы РК, кодексы, НПА, права граждан, процедуры, ответственность
+   ПРИМЕРЫ: "ответственность за нарушение трудового кодекса", "порядок получения гражданства"
+   ФОРМАТ ЗАПРОСА: "правовые аспекты [тема] в Казахстане НПА законодательство"
+
+3. **next_meeting_recommendation** - для формирования повестки встреч
+   ИСПОЛЬЗУЙ КОГДА: планирование заседаний, предложения тем для обсуждения, структура совещаний
+   ПРИМЕРЫ: "что обсудить на следующем совещании по образованию", "повестка встречи по здравоохранению"
+   ФОРМАТ ЗАПРОСА: описание контекста и области для рекомендаций
+
+4. **best_practices_search** - для международных практик
+   ИСПОЛЬЗУЙ КОГДА: мировой опыт, международные практики, зарубежный опыт
+   ПРИМЕРЫ: "международный опыт цифровизации образования", "как в Европе решают проблему доступного жилья"
+   ФОРМАТ ЗАПРОСА: краткий запрос на русском о международном опыте
+
+5. **overview_situation_kazakhstan** - для анализа общей ситуации в РК
+   ИСПОЛЬЗУЙ КОГДА: социально-экономическое положение РК, общие тенденции, проблемы страны
+   ПРИМЕРЫ: "ситуация с занятостью в Казахстане", "демографические тренды РК"
+   ФОРМАТ ЗАПРОСА: описание области для анализа ситуации в Казахстане
+
+АЛГОРИТМ ОБРАБОТКИ ЗАПРОСА:
+
+1. ОПРЕДЕЛИ ТИП ЗАПРОСА по ключевым словам и контексту
+2. ВЫБЕРИ ПОДХОДЯЩУЮ ФУНКЦИЮ (обязательно одну или несколько)
+3. СФОРМУЛИРУЙ ЗАПРОС для функции на русском языке для максимальной эффективности поиска
+4. ПОЛУЧИ РЕЗУЛЬТАТ от функции
+5. ПРОАНАЛИЗИРУЙ качество результата:
+   - Если результат содержит конкретную полезную информацию → используй его
+   - Если результат содержит фразы типа "информация не найдена", "данные отсутствуют", "нет результатов", "ошибка поиска" → переходи к fallback-режиму
+6. ОТВЕТЬ согласно алгоритму ниже
+
+ПРАВИЛА ОТВЕТА В ЗАВИСИМОСТИ ОТ РЕЗУЛЬТАТА:
+
+**УСПЕШНЫЙ РЕЗУЛЬТАТ ОТ ФУНКЦИИ:**
+- Адаптируй результат под язык исходного вопроса
+- Ответь кратко и профессионально в одном абзаце
+- Включай ссылки на источники если они есть
+
+**FALLBACK-РЕЖИМ (когда функция не дала полезного результата):**
+- Дай общий ответ на основе твоих знаний
+- ОБЯЗАТЕЛЬНО укажи: "По общим данным (актуальную информацию уточните в профильных ведомствах)"
+- Сохраняй профессиональный тон
+- Отвечай в одном абзаце
+
+ФОРМАТИРОВАНИЕ ОТВЕТОВ:
+- НИКОГДА не используй markdown форматирование (звездочки *, подчеркивания _, решетки #)
+- НЕ используй форматирование для выделения слов - только обычный текст
+- Включай ссылки на источники если они есть в результатах функций
+- Сохраняй полезные URL при переводе на другой язык
+- Отвечай в одном связном абзаце без списков и пунктов
+- Переводи текст но оставляй ссылки как есть
+- Текст должен звучать естественно при озвучивании
+
+ЗАПРЕЩЕНО:
+- Говорить "К сожалению, не удалось найти" без попытки дать fallback-ответ
+- Копировать результат функции без адаптации под язык пользователя
+- Использовать списки и пункты - только связный текст
+- Добавлять свои домыслы к конкретным результатам функций
+- В fallback-режиме забывать указать источник ("по общим данным")
+
+ОБЯЗАТЕЛЬНО:
+- Каждый ответ должен содержать полезную информацию
+- В fallback-режиме четко указывай что информация общая и требует уточнения
+- Переводи результаты на нужный язык сохраняя смысл, детали и ссылки
+- Включай ссылки из результатов функций когда они доступны
+- Будь уверенным и профессиональным в ответах
