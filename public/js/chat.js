@@ -337,6 +337,7 @@ function setupWebRTC(iceServerUrl, iceServerUsername, iceServerCredential) {
                 // 🎯 АКТИВИРУЕМ ОБЕИЕ КНОПКИ МИКРОФОНА
                 document.getElementById('microphoneRussian').disabled = false;
                 document.getElementById('microphoneKazakh').disabled = false;
+                document.getElementById('microphoneEnglish').disabled = false;
                 document.getElementById('stopSession').disabled = false;
                 document.getElementById('remoteVideo').style.width = '960px';
                 document.getElementById('showTypeMessage').disabled = false;
@@ -975,6 +976,7 @@ window.startSession = () => {
         document.getElementById('configuration').hidden = true;
         document.getElementById('microphoneRussian').disabled = false;
         document.getElementById('microphoneKazakh').disabled = false;
+        document.getElementById('microphoneEnglish').disabled = false;
         document.getElementById('stopSession').disabled = false;
         document.getElementById('localVideo').hidden = false;
         document.getElementById('remoteVideo').style.width = '0.1px';
