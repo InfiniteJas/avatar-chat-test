@@ -428,6 +428,37 @@ function initMessages() {
     }
 }
 
+async function createThread(userQuery) {
+    try {
+        const systemPrompt = getSystemPromptWithLanguage(selectedLanguage);
+        
+        const response = await fetch(`/api/threads`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userQuery }
+                ]
+            })
+        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Proxy error: ${errorData.error || response.statusText}`);
+        }
+        const thread = await response.json();
+        threadId = thread.id;
+        fetchAndRenderThreadMessages();
+        showPending('Отправили запрос…');
+        console.log('Thread created via proxy:', threadId);
+        runAssistant();
+
+    } catch (error) {
+        console.error('Error creating thread:', error);
+        displayError('Ошибка создания беседы');
+    }
+}
+
 function htmlEncode(text) {
     const entityMap = {
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;'
