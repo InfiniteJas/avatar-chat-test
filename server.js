@@ -164,7 +164,7 @@ async function callOriginalDB(message) {
 
     const response = await axios.post(DB_WEBHOOK_URL, payload, {
       headers: { 'Content-Type': 'application/json' },
-      timeout: 30000
+      timeout: 60000
     });
 
     console.log(`Ответ от БД:`, response.data);
