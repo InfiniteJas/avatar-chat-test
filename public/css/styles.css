@@ -1,0 +1,1151 @@
+:root {
+    --primary: #1976d2;
+    --primary-contrast: #ffffff;
+    --bg: #0b0d13;
+    --surface: #ffffff;
+    --surface-contrast: #0a0e12;
+    --divider: rgba(10, 14, 18, 0.12);
+
+    --msg-user: #E8F0FF;
+    --msg-assist: #F6F8FC;
+
+    --avatar-surface: rgba(255, 255, 255, 0.06);
+    --avatar-outline: #ffffff;
+
+    --radius-xxl: 24px;
+    --radius-xl: 20px;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+
+    --shadow-1: 0 10px 22px rgba(0, 0, 0, .18);
+    --shadow-2: 0 8px 30px rgba(0, 0, 0, .25);
+
+    /* сдвиг видео */
+    --avatar-shift-x: 0px;
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%
+}
+
+body {
+    margin: 0;
+    background-image: url("../image/bg.jpg");
+    background-position: center;
+    background-size: cover;
+    color: #0a0e12;
+    font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+h1,
+h2,
+h3 {
+    margin: 0 0 .5rem
+}
+
+small {
+    font-size: .8rem
+}
+
+.page {
+    padding: 16px
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    /* spacing={2} аналог */
+    padding: 25px 10%;
+}
+
+@media (min-width:900px) {
+    .grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width:1200px) {
+    .grid {
+        grid-template-columns: 1fr 2fr;
+    }
+}
+
+/* Cards */
+.card {
+    border: 1px solid var(--divider);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    overflow: hidden;
+}
+
+/* Avatar card */
+.avatar-card {
+    background: #165ddf;
+    color: var(--primary-contrast);
+    border: none;
+    padding: 16px;
+    max-height: 90vh;
+    height: 90vh;
+    margin: auto 0;
+}
+
+.avatar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.avatar-head__title {
+    font-weight: 800;
+    font-size: 24px;
+    color: #fff;
+}
+
+.avatar-head__status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #F6A5A5;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, .12) inset;
+}
+
+.status-dot.ok {
+    background: #D1D6E0;
+}
+
+.status-text {
+    color: rgba(255, 255, 255, .85);
+    font-size: .85rem;
+}
+
+/* Видео-блок аватара */
+.avatar-box {
+    position: relative;
+    max-width: 960px;
+    margin: 0 auto 8px;
+    height: 520px;
+    /* как в реакте */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .06);
+    border-radius: 50%;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+}
+
+.avatar-box__overlay {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+}
+
+.avatar-box__history {
+    border: none;
+    resize: none;
+    background: transparent;
+    overflow: hidden;
+}
+
+.avatar-box__local video {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-box__remote {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+#remoteVideo video,
+#localVideo video {
+    height: 100% !important;
+    width: auto !important;
+    display: block;
+    border-radius: 20px;
+    transform: translateX(var(--avatar-shift-x));
+}
+
+#subtitles {
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    position: absolute;
+    bottom: 5%;
+    z-index: 999;
+    left: 0;
+    padding: 0 8px;
+}
+
+@media (max-width: 900px) {
+    :root {
+        --avatar-shift-x: 0px;
+    }
+}
+
+/* Chat card (правая) */
+.chat-card {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    height: 90vh;
+    margin: auto 0;
+    border: none;
+    padding: 16px;
+}
+
+.chat-head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    background: #fff;
+    border-bottom: 1px solid var(--divider);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+}
+
+.chat-head__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-head h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+.conn {
+    font-size: .8rem;
+}
+
+.conn--ok {
+    color: #2e7d32;
+}
+
+.conn--error {
+    color: #d32f2f;
+}
+
+/* История + сообщения */
+.chat-history {
+    padding: 8px 16px;
+    flex: 1;
+    overflow: auto;
+    max-height: 80%;
+}
+
+.msg {
+    display: flex;
+    margin: 6px 0;
+}
+
+.msg--user {
+    justify-content: flex-end;
+}
+
+.msg--assistant {
+    justify-content: flex-start;
+}
+
+.msg__bubble {
+    max-width: 72%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(10, 14, 18, 0.06);
+    font-size: .95rem;
+    white-space: pre-wrap;
+    color: #111;
+}
+
+.msg--user .msg__bubble {
+    background: var(--msg-user);
+}
+
+.msg--assistant .msg__bubble {
+    background: var(--msg-assist);
+}
+
+/* Быстрые чипсы */
+.quick {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    border-top: 1px dashed var(--divider);
+}
+
+.chip {
+    border: 1px solid var(--divider);
+    background: #fff;
+    border-radius: 16px;
+    padding: 6px 10px;
+    font-size: .85rem;
+    cursor: pointer;
+}
+
+.chip:hover {
+    background: #f7f9ff;
+}
+
+/* Инпут-капсула (если понадобится) */
+.chat-input {
+    padding: 16px;
+    border-top: 1px solid var(--divider);
+}
+
+.capsule {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    border: 1px solid rgba(10, 14, 18, 0.08);
+    border-radius: 9999px;
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.capsule__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    min-height: 24px;
+    max-height: 180px;
+    font: inherit;
+    line-height: 1.4;
+}
+
+/* Панели/кнопки */
+.toolbar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.toolbar--center {
+    justify-content: center;
+}
+
+.toolbar--wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 8px 0 16px;
+}
+
+.toolbar--compact {
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.toolbar--text {
+    gap: 8px;
+}
+
+/* Базовая кнопка */
+.btn {
+    appearance: none;
+    border: 1px solid rgba(10, 14, 18, .12);
+    background: #fff;
+    color: #1f2937;
+    font-weight: 600;
+    line-height: 1;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: .15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+
+.btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled) {
+    background: #f6f8fc;
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.btn--pill {
+    border-radius: 9999px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Варианты кнопок */
+.btn--primary {
+    background: #1976d2;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(25, 118, 210, .25);
+}
+
+.btn--primary:hover {
+    background: #1565c0;
+}
+
+.btn--primary-soft {
+    background: #eaf2fd;
+    border-color: #d5e4fb;
+    color: #0b3b82;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, .12);
+}
+
+.btn--primary-soft:hover {
+    background: #e1ecfd;
+}
+
+.btn--ghost {
+    background: #fff;
+    color: #374151;
+    border-color: rgba(10, 14, 18, .16);
+}
+
+.btn--ghost:hover {
+    background: #f8fafc;
+}
+
+.btn--green {
+    background: #4CAF50;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(76, 175, 80, .20);
+}
+
+.btn--green:hover {
+    background: #449D48;
+}
+
+.btn--blue {
+    background: #2196F3;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(33, 150, 243, .20);
+}
+
+.btn--blue:hover {
+    background: #1E88E5;
+}
+
+.btn--success {
+    background: #22c55e;
+    border: 1px solid #1fb455;
+    color: #fff;
+    box-shadow: 0 6px 14px rgba(34, 197, 94, .25);
+}
+
+.btn--success:hover {
+    background: #16a34a !important;
+}
+
+/* Компактные кнопки в панели */
+.toolbar--compact .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+}
+
+.toolbar--compact .btn--pill {
+    height: 32px;
+    border-radius: 9999px;
+}
+
+/* Кнопки как текст */
+.btn--text {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    height: auto;
+    border-radius: 0;
+    color: #e7e7e7;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn--text:hover:not(:disabled) {
+    color: #9ca3af;
+    text-decoration: underline;
+}
+
+.btn--text:disabled {
+    color: #9ca3af;
+    cursor: default;
+    text-decoration: none;
+}
+
+/* Иконки */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    background: #eef1f5;
+    color: #4b5563;
+    display: grid;
+    place-items: center;
+}
+
+.icon-btn:hover {
+    background: #e2e6ee;
+}
+
+.icon-btn--primary {
+    width: 44px;
+    height: 44px;
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .1);
+}
+
+.icon-btn--primary:hover {
+    background: #1565c0;
+}
+
+/* Type Message */
+.typebox {
+    max-width: 720px;
+    margin: 5px auto 0;
+}
+
+.typebox__toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    user-select: none;
+    color: #111827;
+}
+
+.typebox__toggle input {
+    accent-color: #1976d2;
+}
+
+.typebox__toggle label {
+    font-size: 14px;
+}
+
+.typebox__editor {
+    max-width: 940px;
+    min-height: 75px;
+    max-height: 200px;
+    padding: 10px 12px;
+    overflow-y: auto;
+    border: 1px solid rgba(10, 14, 18, .18);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .04) inset;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.typebox__editor:focus {
+    outline: 2px solid rgba(25, 118, 210, .25);
+}
+
+.typebox__attach {
+    max-width: 960px;
+    margin: 8px auto 0;
+}
+
+.typebox__attach img {
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    display: block;
+    filter: grayscale(.1);
+}
+
+.typebox--dock {
+    width: 100%;
+    max-width: 100%;
+}
+
+.typebox--dock .typebox__editor {
+    width: 100%;
+    max-width: 100%;
+}
+
+.typebox--dock .typebox__attach {
+    width: auto;
+    margin-left: 4px;
+}
+
+.typebox__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+}
+
+.typebox__row .typebox__editor {
+    flex: 1;
+    max-width: 100%;
+}
+
+.typebox__attach--right {
+    display: flex;
+    align-items: center;
+}
+
+/* Контейнер чата докнут вниз */
+.chat-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 12px 16px;
+}
+
+.chat-spacer {
+    height: 0;
+}
+
+/* Разделитель-текст, если нужен */
+.sep {
+    color: #9ca3af;
+    user-select: none;
+}
+
+.chat-history a {
+    color: var(--primary);
+    text-decoration: underline;
+    word-break: break-all;
+}
+
+.chat-history a:hover {
+    text-decoration: none;
+}
+
+.btn--with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1;
+}
+
+.btn__icon {
+    width: 18px;
+    height: 18px;
+    display: inline-grid;
+    place-items: center;
+}
+
+/* Toolbar layout (оставим как есть, лишь немного пространства) */
+.toolbar.toolbar--compact {
+    gap: 8px;
+}
+
+/* Бизнес-стиль для квадратных кнопок-иконок */
+.btn.btn--square {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+    /* мягкие углы вместо "pill" */
+    border: 1px solid #E2E8F0;
+    /* нейтральная обводка */
+    background: #FFFFFF;
+    /* чистый фон */
+    color: #0F172A;
+    /* почти чёрный текст/иконка */
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s ease, border-color .2s ease, transform .1s ease, box-shadow .2s ease, color .2s ease;
+}
+
+.btn.btn--square:hover:not([disabled]) {
+    background: #F8FAFC;
+    /* лёгкий hover */
+    border-color: #CBD5E1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(16, 24, 40, 0.08);
+}
+
+.btn.btn--square:active:not([disabled]) {
+    transform: translateY(0);
+    background: #EEF2F7;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.btn.btn--square:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 2px #FFFFFF,
+        0 0 0 4px #94A3B8;
+    /* спокойное focus-кольцо */
+}
+
+/* Состояние disabled */
+.btn.btn--square[disabled] {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+/* Поддержка тёмного фона/картинки: чуть темнее границы/фон при необходимости */
+@media (prefers-color-scheme: dark) {
+    .btn.btn--square {
+        background: rgba(255, 255, 255, 0.94);
+        border-color: #E5E7EB;
+    }
+}
+
+/* =========================
+   ADAPT: Typebox + actions
+   ========================= */
+
+/* Ряд с редактором и блоком действий справа */
+.typebox__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    /* редактор растёт, действия — по контенту */
+    gap: 12px;
+    align-items: end;
+}
+
+/* Секция действий (скрепка + отправить) */
+.typebox__actions {
+    display: inline-flex;
+    gap: 8px;
+}
+
+/* Плейсхолдер для contentEditable */
+.typebox__editor:empty:before {
+    content: "Введите сообщение…";
+    color: #94A3B8;
+}
+
+/* Квадратные и «праймари» кнопки (деловой стиль) */
+.btn.btn--square {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #0F172A;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, border-color .2s, transform .1s, box-shadow .2s, color .2s;
+}
+
+.btn.btn--square:hover:not([disabled]) {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(16, 24, 40, 0.08);
+}
+
+.btn.btn--square:active:not([disabled]) {
+    transform: none;
+    background: #EEF2F7;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.btn.btn--square[disabled] {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+/* Кнопка отправки (плотная, деловая) */
+.btn.btn--primary {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid #0F172A;
+    background: #0F172A;
+    color: #fff;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .15);
+    transition: background .2s, border-color .2s, transform .1s, box-shadow .2s;
+}
+
+.btn.btn--primary:hover {
+    background: #111827;
+    border-color: #111827;
+    transform: translateY(-1px);
+}
+
+.btn.btn--primary:active {
+    transform: none;
+}
+
+/* Иконки внутри кнопок по центру, без сдвига */
+.btn.btn--primary svg,
+.btn.btn--square svg {
+    display: block;
+}
+
+/* =========================
+     ADAPT: Chat/History Mobile
+     ========================= */
+
+/* Чуть больше кликабельности на мобильных */
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: 1fr !important;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .avatar-card,
+    .chat-card {
+        height: auto;
+        max-height: none;
+    }
+
+    .avatar-box {
+        height: 360px;
+        /* ниже, чтобы поместилось */
+        border-radius: 24px;
+        /* вместо круга, лучше под мобильные */
+    }
+
+    .avatar-box__remote {
+        border-radius: 16px;
+    }
+
+    #remoteVideo video,
+    #localVideo video {
+        border-radius: 16px !important;
+    }
+
+    .chat-head h2 {
+        font-size: 20px;
+    }
+
+    .chat-history {
+        padding: 8px 8px;
+    }
+
+    .msg__bubble {
+        max-width: 86%;
+        font-size: .95rem;
+    }
+
+    .typebox {
+        max-width: 100%;
+        margin: 8px 0 0;
+    }
+
+    .typebox__row {
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+    }
+
+    .btn.btn--square {
+        width: 44px;
+        height: 44px;
+    }
+
+    .btn.btn--primary {
+        height: 44px;
+        padding: 0 16px;
+    }
+}
+
+/* =========================
+     ADAPT: Better contrast on bg image
+     ========================= */
+
+.avatar-card {
+    /* чуть выше контраст на цветном фоне */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, .18);
+}
+
+.chat-card {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, .14);
+}
+
+/* =========================
+     ADAPT: Dark scheme polish
+     ========================= */
+@media (prefers-color-scheme: dark) {
+    .chat-head {
+        background: rgba(255, 255, 255, 0.98);
+    }
+
+    .typebox__editor {
+        background: #fff;
+        border-color: rgba(10, 14, 18, .18);
+        color: #0F172A;
+    }
+
+    .btn.btn--square {
+        background: rgba(255, 255, 255, 0.96);
+        border-color: #E5E7EB;
+    }
+}
+
+/* =========================
+     ADAPT: Subtitles readability
+     ========================= */
+#subtitles {
+    font-weight: 700;
+    letter-spacing: .2px;
+    line-height: 1.2;
+}
+
+/* =========================
+     ADAPT: Message bubbles polish
+     ========================= */
+.msg__bubble {
+    border-color: rgba(10, 14, 18, 0.08);
+    backdrop-filter: saturate(1.05);
+}
+
+
+/* sadsad */
+
+/* Аватар-карта: гибкая колонка без фиксированных внешних отступов */
+.avatar-card {
+    background: #165ddf;
+    color: var(--primary-contrast);
+    border: none;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    /* вместо фикс. 90vh даем гибкость: при высоких экранах тянется, при низких — не ломает кнопки */
+    min-height: 80vh;
+    max-height: 100vh;
+}
+
+/* Внутренняя колонка: заголовок -> видео -> действия */
+.avatar-head {
+    flex: 0 0 auto;
+}
+
+#videoContainer.avatar-box {
+    /* видео адаптивно занимает доступное пространство между хедером и кнопками */
+    flex: 1 1 auto;
+    min-height: clamp(220px, 45vh, 520px);
+    margin: 8px 0;
+    /* вместо инлайновых margin-top */
+    border-radius: 50%;
+    /* чуть мягче на маленьких экранах */
+}
+
+/* Блок действий всегда виден: липнет к низу, с разграничителем */
+.avatar-actions,
+.avatar-actions__tools {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
+
+/* Общий фон-подложка, чтобы кнопки читались поверх видео */
+.avatar-actions,
+.avatar-actions__tools {
+    background:
+        linear-gradient(to top, rgba(22, 93, 223, 0.75), rgba(22, 93, 223, 0.50) 60%, rgba(22, 93, 223, 0.0));
+    backdrop-filter: blur(2px);
+    padding: 10px 8px;
+}
+
+/* Горизонтальное выравнивание без «жестких» марджинов */
+.avatar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.avatar-actions__langs {
+    display: inline-flex;
+    gap: 10px;
+}
+
+/* Нижняя панель иконок — такая же сетка/центрирование */
+.avatar-actions__tools {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding-top: 6px;
+}
+
+/* Круглая видеомаска на десктопах и мягче на мобильных */
+.avatar-box {
+    border-radius: 50%;
+}
+
+.avatar-box__remote {
+    border-radius: 50%;
+}
+
+#remoteVideo video,
+#localVideo video {
+    border-radius: 50% !important;
+}
+
+/* ==== Link Preview Pane ==== */
+.chat-card {
+    position: relative;
+}
+
+.linkpane {
+    position: absolute;
+    top: 48px;
+    /* ниже шапки чата */
+    right: 0;
+    bottom: 0;
+    width: min(560px, 48%);
+    display: none;
+    flex-direction: column;
+    background: #fff;
+    border-left: 1px solid var(--divider);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, .08);
+    z-index: 3;
+}
+
+.linkpane--open {
+    display: flex;
+}
+
+.linkpane__header {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 8px;
+    border-bottom: 1px solid var(--divider);
+    background: #fff;
+}
+
+.linkpane__title {
+    font-weight: 700;
+    color: #0F172A;
+    padding-left: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.linkpane__actions {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.linkpane__frame {
+    border: 0;
+    width: 100%;
+    height: calc(100% - 48px);
+    background: #fff;
+}
+
+.linkpane__media {
+    display: block;
+}
+
+/* Мобильный режим — панель во весь экран поверх чата */
+@media (max-width: 900px) {
+    .linkpane {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: auto;
+        border-left: none;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, .25);
+    }
+
+    .linkpane__header {
+        height: 52px;
+    }
+
+    .linkpane__frame {
+        height: calc(100% - 52px);
+    }
+}
+
+
+@media (max-height: 760px) {
+    #videoContainer.avatar-box {
+        min-height: clamp(200px, 36vh, 480px);
+    }
+
+    .avatar-box {
+        border-radius: 24px;
+    }
+
+    .avatar-box__remote {
+        border-radius: 24px;
+    }
+
+    #remoteVideo video,
+    #localVideo video {
+        border-radius: 24px !important;
+    }
+
+    #videoContainer.avatar-box {
+        border-radius: 24px;
+    }
+}
+
+/* На мобильных — компактнее высота */
+@media (max-width: 600px) {
+    .chat-card {}
+
+    .chat-body {
+        max-height: 500px;
+        padding: 8px 12px;
+    }
+
+    .avatar-card {
+        min-height: 100vh;
+    }
+
+    .avatar-actions,
+    .avatar-actions__tools {
+        padding: 12px 10px;
+    }
+}
