@@ -1030,7 +1030,8 @@ function startMicrophone(language) {
     // Настраиваем языки в зависимости от выбранного режима
     if (language === "en") {
         // Английский - строго БЕЗ автодетекта
-        speechRecognitionConfig.speechRecognitionLanguage = "en-US";
+        speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
+        const autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["en-US", "ru-RU"]);
         speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
             speechRecognitionConfig,
             autoDetectConfig,
