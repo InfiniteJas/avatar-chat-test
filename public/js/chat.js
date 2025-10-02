@@ -1,5 +1,4 @@
 // Глобальные объекты
-
 var speechRecognizer;
 var avatarSynthesizer;
 var peerConnection;
@@ -24,7 +23,7 @@ var pendingMsgEl = null;
 var sttBuffer = '';
 var muteWhileRecording = false;
 
-// 🎯 НОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ ДЛЯ ВЫБРАННОГО ЯЗЫКА
+// НОВАЯ ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ ДЛЯ ВЫБРАННОГО ЯЗЫКА
 var selectedLanguage = "ru"; // по умолчанию русский
 
 // Assistant API переменные
@@ -145,6 +144,218 @@ function normalizeRegionNames(text) {
     }
     
     return normalized;
+}
+
+// Обратная денормализация: канонические названия → язык пользователя
+function denormalizeResponse(text, userLanguage) {
+    if (userLanguage === 'ru') {
+        // Для русского оставляем как есть
+        return text;
+    }
+
+    // Обратный маппинг для английского и казахского
+    const reverseMapping = {
+        "Акмолинская область": {
+            en: "Akmola region",
+            kk: "Ақмола облысы"
+        },
+        "Актюбинская область": {
+            en: "Aktobe region",
+            kk: "Ақтөбе облысы"
+        },
+        "Алматинская область": {
+            en: "Almaty region",
+            kk: "Алматы облысы"
+        },
+        "Атырауская область": {
+            en: "Atyrau region",
+            kk: "Атырау облысы"
+        },
+        "Восточно-Казахстанская область": {
+            en: "East Kazakhstan region",
+            kk: "Шығыс Қазақстан облысы"
+        },
+        "Жамбылская область": {
+            en: "Zhambyl region",
+            kk: "Жамбыл облысы"
+        },
+        "Западно-Казахстанская область": {
+            en: "West Kazakhstan region",
+            kk: "Батыс Қазақстан облысы"
+        },
+        "Карагандинская область": {
+            en: "Karaganda region",
+            kk: "Қарағанды облысы"
+        },
+        "Костанайская область": {
+            en: "Kostanay region",
+            kk: "Қостанай облысы"
+        },
+        "Кызылординская область": {
+            en: "Kyzylorda region",
+            kk: "Қызылорда облысы"
+        },
+        "Мангистауская область": {
+            en: "Mangystau region",
+            kk: "Маңғыстау облысы"
+        },
+        "Павлодарская область": {
+            en: "Pavlodar region",
+            kk: "Павлодар облысы"
+        },
+        "Северо-Казахстанская область": {
+            en: "North Kazakhstan region",
+            kk: "Солтүстік Қазақстан облысы"
+        },
+        "Туркестанская область": {
+            en: "Turkestan region",
+            kk: "Түркістан облысы"
+        },
+        "Область Абай": {
+            en: "Abai region",
+            kk: "Абай облысы"
+        },
+        "Область Жетісу": {
+            en: "Zhetysu region",
+            kk: "Жетісу облысы"
+        },
+        "Область Ұлытау": {
+            en: "Ulytau region",
+            kk: "Ұлытау облысы"
+        },
+        "город Алматы": {
+            en: "Almaty city",
+            kk: "Алматы қаласы"
+        },
+        "город Астана": {
+            en: "Astana city",
+            kk: "Астана қаласы"
+        },
+        "город Шымкент": {
+            en: "Shymkent city",
+            kk: "Шымкент қаласы"
+        }
+    };
+
+    let denormalized = text;
+
+    for (const [canonical, translations] of Object.entries(reverseMapping)) {
+        if (translations[userLanguage]) {
+            const regex = new RegExp(canonical.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            denormalized = denormalized.replace(regex, translations[userLanguage]);
+            
+            if (regex.test(text)) {
+                console.log(`🔄 Денормализация: "${canonical}" → "${translations[userLanguage]}"`);
+            }
+        }
+    }
+
+    return denormalized;
+}// Обратная денормализация: канонические названия → язык пользователя
+function denormalizeResponse(text, userLanguage) {
+    if (userLanguage === 'ru') {
+        // Для русского оставляем как есть
+        return text;
+    }
+
+    // Обратный маппинг для английского и казахского
+    const reverseMapping = {
+        "Акмолинская область": {
+            en: "Akmola region",
+            kk: "Ақмола облысы"
+        },
+        "Актюбинская область": {
+            en: "Aktobe region",
+            kk: "Ақтөбе облысы"
+        },
+        "Алматинская область": {
+            en: "Almaty region",
+            kk: "Алматы облысы"
+        },
+        "Атырауская область": {
+            en: "Atyrau region",
+            kk: "Атырау облысы"
+        },
+        "Восточно-Казахстанская область": {
+            en: "East Kazakhstan region",
+            kk: "Шығыс Қазақстан облысы"
+        },
+        "Жамбылская область": {
+            en: "Zhambyl region",
+            kk: "Жамбыл облысы"
+        },
+        "Западно-Казахстанская область": {
+            en: "West Kazakhstan region",
+            kk: "Батыс Қазақстан облысы"
+        },
+        "Карагандинская область": {
+            en: "Karaganda region",
+            kk: "Қарағанды облысы"
+        },
+        "Костанайская область": {
+            en: "Kostanay region",
+            kk: "Қостанай облысы"
+        },
+        "Кызылординская область": {
+            en: "Kyzylorda region",
+            kk: "Қызылорда облысы"
+        },
+        "Мангистауская область": {
+            en: "Mangystau region",
+            kk: "Маңғыстау облысы"
+        },
+        "Павлодарская область": {
+            en: "Pavlodar region",
+            kk: "Павлодар облысы"
+        },
+        "Северо-Казахстанская область": {
+            en: "North Kazakhstan region",
+            kk: "Солтүстік Қазақстан облысы"
+        },
+        "Туркестанская область": {
+            en: "Turkestan region",
+            kk: "Түркістан облысы"
+        },
+        "Область Абай": {
+            en: "Abai region",
+            kk: "Абай облысы"
+        },
+        "Область Жетісу": {
+            en: "Zhetysu region",
+            kk: "Жетісу облысы"
+        },
+        "Область Ұлытау": {
+            en: "Ulytau region",
+            kk: "Ұлытау облысы"
+        },
+        "город Алматы": {
+            en: "Almaty city",
+            kk: "Алматы қаласы"
+        },
+        "город Астана": {
+            en: "Astana city",
+            kk: "Астана қаласы"
+        },
+        "город Шымкент": {
+            en: "Shymkent city",
+            kk: "Шымкент қаласы"
+        }
+    };
+
+    let denormalized = text;
+
+    for (const [canonical, translations] of Object.entries(reverseMapping)) {
+        if (translations[userLanguage]) {
+            const regex = new RegExp(canonical.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            denormalized = denormalized.replace(regex, translations[userLanguage]);
+            
+            if (regex.test(text)) {
+                console.log(`🔄 Денормализация: "${canonical}" → "${translations[userLanguage]}"`);
+            }
+        }
+    }
+
+    return denormalized;
 }
 
 function showPending(text) {
@@ -652,12 +863,14 @@ function handleUserQuery(userQuery, userQueryHTML = "", imgUrlPath = "", languag
     console.log(`🌐 Пользователь выбрал язык: ${selectedLanguage}`);
     console.log(`🗣️ Пользователь сказал: "${userQuery}"`);
 
-    // НОВОЕ: Нормализуем названия регионов
-    const normalizedQuery = normalizeRegionNames(userQuery);
+    appendUserMessage(userQuery);
 
     if (isSpeaking) {
         stopSpeaking();
     }
+
+    const normalizedQuery = normalizeRegionNames(userQuery);
+    console.log(`🔍 Отправляем в API (normalized): "${normalizedQuery}"`);
 
     if (!threadId) {
         createThread(normalizedQuery);
@@ -797,18 +1010,28 @@ async function getAssistantResponse() {
 
         if (assistantMessage && assistantMessage.content[0]) {
             const responseText = assistantMessage.content[0].text.value;
+            
+            // ✅ Денормализация перед показом на фронте
+            const displayText = denormalizeResponse(responseText, selectedLanguage);
+            
             removePending();
-            console.log('Assistant response:', responseText.substring(0, 100) + "...");
-            appendAssistantMessage(responseText);
-            displayAndSpeakResponse(responseText, selectedLanguage);
+            console.log('Assistant response (original):', responseText.substring(0, 100) + "...");
+            console.log('Display text (denormalized):', displayText.substring(0, 100) + "...");
+            
+            appendAssistantMessage(displayText);
+            displayAndSpeakResponse(displayText, selectedLanguage);
         } else {
             const lastAssistantMessage = messagesData.data.find(msg => msg.role === 'assistant');
             if (lastAssistantMessage && lastAssistantMessage.content[0]) {
                 const responseText = lastAssistantMessage.content[0].text.value;
+                
+                // Денормализация для fallback
+                const displayText = denormalizeResponse(responseText, selectedLanguage);
+                
                 console.log('Assistant response (fallback):', responseText.substring(0, 100) + "...");
                 removePending();
-                appendAssistantMessage(responseText);
-                displayAndSpeakResponse(responseText, selectedLanguage);
+                appendAssistantMessage(displayText);
+                displayAndSpeakResponse(displayText, selectedLanguage);
             } else {
                 displayError('Не удалось получить ответ ассистента');
             }
@@ -977,7 +1200,7 @@ function startMicrophone(language) {
                 const finalText = sttBuffer.trim();
                 sttBuffer = '';
                 if (finalText) {
-                    appendUserMessage(finalText);
+                    // appendUserMessage(finalText);
                     handleUserQuery(finalText, "", "", selectedLanguage);
                 }
             },
@@ -1030,11 +1253,9 @@ function startMicrophone(language) {
     // Настраиваем языки в зависимости от выбранного режима
     if (language === "en") {
         // Английский - строго БЕЗ автодетекта
-        speechRecognitionConfig.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_LanguageIdMode, "Continuous");
-        const autoDetectConfig = SpeechSDK.AutoDetectSourceLanguageConfig.fromLanguages(["en-US", "ru-RU"]);
-        speechRecognizer = SpeechSDK.SpeechRecognizer.FromConfig(
+        speechRecognitionConfig.speechRecognitionLanguage = "en-US";
+        speechRecognizer = new SpeechSDK.SpeechRecognizer(
             speechRecognitionConfig,
-            autoDetectConfig,
             SpeechSDK.AudioConfig.fromDefaultMicrophoneInput()
         );
         console.log("🎤 STT режим: English (strict, no auto-detect)");
